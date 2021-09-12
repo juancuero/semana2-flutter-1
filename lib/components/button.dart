@@ -9,7 +9,7 @@ Widget pintarBoton(
       flex: valorflex,
       child: Container(
         child: Padding(
-          padding: const EdgeInsets.all(2.0),
+          padding: const EdgeInsets.all(3.0),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               primary: btnColor,

@@ -13,70 +13,49 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    double size = MediaQuery.of(context).size.width / 6;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text("Calculadora Juan Cuero"),
+        backgroundColor: Color(0xff202124),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              child: Row(
-                children: [Text("Zona resultados")],
-              ),
-              color: Colors.blue,
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    "0",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 50,
+      body: Container(
+        color: Color(0xff202124),
+        child: Column(
+          children: [
+            ContainerShowWidget(textValue: "", fontSize: 40),
+            ContainerShowWidget(textValue: "0", fontSize: 30),
+            Expanded(
+              flex: 2,
+              child: Container(
+                //width: double.infinity,
+                // height: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: _listaBotones1(),
                     ),
-                  )
-                ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: _listaBotones2(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: _listaBotones3(),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: _listaBotones4(),
+                    ),
+                  ],
+                ),
+                color: Color(0xff202124),
               ),
-              color: Color(0xff3C4043),
-            ),
-          ),
-          Expanded(
-            flex: 5,
-            child: Container(
-              //width: double.infinity,
-              // height: double.infinity,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: _listaBotones1(),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: _listaBotones2(),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: _listaBotones3(),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: _listaBotones4(),
-                  ),
-                ],
-              ),
-              color: Color(0xff202124),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -126,5 +105,39 @@ class _HomePageState extends State<HomePage> {
           valorflex: 2,
           btnColor: Colors.green),
     ];
+  }
+}
+
+class ContainerShowWidget extends StatelessWidget {
+  final String textValue;
+  final double fontSize;
+
+  const ContainerShowWidget(
+      {Key? key, required this.textValue, required this.fontSize})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 2,
+      child: Container(
+        margin: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            color: Color(0xff3C4043), borderRadius: BorderRadius.circular(50)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              textValue,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: fontSize,
+              ),
+            )
+          ],
+        ),
+        //color: Color(0xff3C4043),
+      ),
+    );
   }
 }

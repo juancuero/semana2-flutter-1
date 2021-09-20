@@ -13,7 +13,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _expressions = "";
-  String _result = "";
+  String _result = "0";
+  String _expressions_original = "";
+  String _result_aux = "";
+  bool _after_equal = false;
+  List<HistorialWidget> _historial = [];
+  String _lastChar = "";
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +36,17 @@ class _HomePageState extends State<HomePage> {
       color: Color(0xff202124),
       child: Column(
         children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Column(
+                  children: _historial,
+                )
+              ],
+            ),
+          ),
           ContainerShowWidget(textValue: "$_result", fontSize: 40),
           ContainerShowWidget(textValue: "$_expressions", fontSize: 30),
           Expanded(
@@ -90,11 +106,7 @@ class _HomePageState extends State<HomePage> {
             addValue("/");
           },
           componente: Text("/")),
-      pintarBoton(
-          metodo: () {
-            addValue("remove_ant");
-          },
-          componente: Text("<-")),
+      pintarBoton(metodo: delete, componente: Icon(Icons.backspace)),
       pintarBoton(
           metodo: () {
             cleanField();
@@ -162,12 +174,12 @@ class _HomePageState extends State<HomePage> {
           componente: Text("-")),
       pintarBoton(
           metodo: () {
-            addValue("");
+            addValue("\u00B2");
           },
-          componente: Text("x²")),
+          componente: Text("x\u00B2")),
       pintarBoton(
           metodo: () {
-            addValue("");
+            addValue("√");
           },
           componente: Text("√")),
     ];
@@ -207,36 +219,128 @@ class _HomePageState extends State<HomePage> {
 
   addValue(String val) {
     print("Llega $val");
+
+    if (_expressions.length > 0) {
+      _lastChar = _expressions.substring(_expressions.length - 1);
+      if (_lastChar != ".") {
+        if (!isNumeric(_lastChar) && !isNumeric(val)) {
+          _expressions = _expressions.substring(0, _expressions.length - 1);
+        }
+      }
+    }
+
+    print("antes");
+
+    print(_lastChar);
+
     setState(() {
-      if (_expressions == "0")
+      if (_expressions == "0") {
         _expressions = val;
-      else
-        _expressions += val;
+      } else {
+        if (_after_equal) {
+          print("siii");
+          _expressions = "";
+          _expressions += val;
+
+          _after_equal = false;
+        } else {
+          print("nooo es");
+          _expressions += val;
+        }
+      }
     });
   }
 
+  bool isNumeric(String s) {
+    // ignore: unnecessary_null_comparison
+    if (s == null) {
+      return false;
+    }
+    return double.tryParse(s) != null;
+  }
+
   cleanField() {
+    _after_equal = false;
     setState(() {
       _expressions = "";
       _result = "";
     });
   }
 
+  delete() {
+    setState(() {
+      _expressions = (_expressions.length > 1 && _expressions != "0")
+          ? _expressions.substring(0, _expressions.length - 1)
+          : "0";
+    });
+  }
+
+  bool validated() {
+    return false;
+  }
+
   generateResult() {
+    _expressions_original = _expressions;
+
+    if (_expressions.contains("%")) {
+      _expressions = _expressions.replaceAll("%", "");
+      var arr = _expressions.split('*');
+      _expressions = "(" + arr[0] + "*" + arr[1] + ")" + "/100";
+    }
+
     try {
       Parser parser = new Parser();
       ContextModel contextModel = new ContextModel();
+      if (_expressions.contains("\u00B2")) {
+        _expressions = _expressions.replaceAll("\u00B2", "^2");
+      }
+      if (_expressions.contains("√")) {
+        _expressions = _expressions.replaceAll("√", "");
+        _expressions = _expressions + "^0.5";
+      }
       Expression expressionFinal = parser.parse(_expressions);
+      _after_equal = true;
       setState(() {
         _result = expressionFinal
             .evaluate(EvaluationType.REAL, contextModel)
             .toString();
+        _result_aux = _result;
+        _expressions = _expressions_original;
       });
+      var addHistorial = _expressions_original + " = " + _result;
+      if (_historial.length == 3) {
+        _historial.removeAt(0);
+        _historial.add(HistorialWidget(
+          textValue: addHistorial,
+        ));
+      } else {
+        _historial.add(HistorialWidget(
+          textValue: addHistorial,
+        ));
+      }
+
+      print(_historial);
     } catch (e) {
       setState(() {
         _result = "Sintaxis Error";
       });
     }
+  }
+}
+
+class HistorialWidget extends StatelessWidget {
+  final String textValue;
+  const HistorialWidget({Key? key, required this.textValue}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      textValue,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 18,
+      ),
+    );
   }
 }
 
